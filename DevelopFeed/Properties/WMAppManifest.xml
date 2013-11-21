@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Deployment xmlns="http://schemas.microsoft.com/windowsphone/2009/deployment" AppPlatformVersion="7.1">
+  <App xmlns="" ProductID="{37931483-845b-460a-9263-d51981e014e5}" Title="Develop News Feed" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Jason El-Massih" Description="Stay up to date in the Game Development and Design Industy with Breaking News, Features and Blog from Develop Magazine." Publisher="Bovine Productions" BitsPerPixel="32">
+    <IconPath IsRelative="true" IsResource="false">dAppIcon.png</IconPath>
+    <Capabilities>
+      <Capability Name="ID_CAP_NETWORKING" />
+    </Capabilities>
+    <Tasks>
+      <DefaultTask Name="_default" NavigationPage="MainPage.xaml" />
+    </Tasks>
+    <Tokens>
+      <PrimaryToken TokenID="DevelopFeedToken" TaskName="_default">
+        <TemplateType5>
+          <BackgroundImageURI IsRelative="true" IsResource="false">dTileIcon.png</BackgroundImageURI>
+          <Count>0</Count>
+          <Title>Develop Feed</Title>
+        </TemplateType5>
+      </PrimaryToken>
+    </Tokens>
+  </App>
+</Deployment>

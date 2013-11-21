@@ -1,0 +1,253 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="DevelopFeed.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:telerikListBox="clr-namespace:Telerik.Windows.Controls.DataBoundListBox;assembly=Telerik.Windows.Controls.Primitives"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768" 
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="White"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="True" Background="White">
+
+    <phone:PhoneApplicationPage.Resources>
+        <DataTemplate x:Key="FeedItemTemplate">
+            <StackPanel VerticalAlignment="Top" Margin="0,0,0,20">
+                <TextBlock FontSize="24" Name="feedTitle" TextWrapping="Wrap" Margin="12,0,0,0" HorizontalAlignment="Left" Text="{Binding Title.Text, Converter={StaticResource RssTextTrimmer}}" Foreground="#FF08568D" />
+                <TextBlock Name="feedSummary" TextWrapping="Wrap" Margin="12,0,0,0" Text="{Binding Summary.Text, Converter={StaticResource RssTextTrimmer}}" Foreground="Black" />
+                <TextBlock Name="feedPubDate" Margin="12,0,0,10" Text="{Binding PublishDate.DateTime}" Foreground="#993B3B3B" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="HeaderTemplate">
+            <Grid>
+                <TextBlock Name="PivotHeader" FontSize="60" Text="{Binding}" Padding="0 0 0 30" />
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="RefreshControl" TargetType="telerikListBox:PullToRefreshIndicatorControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="telerikListBox:PullToRefreshIndicatorControl">
+                        <Border
+                     RenderTransformOrigin="1, 0"
+                     x:Name="PART_LayoutRoot"
+                     Background="{TemplateBinding Background}"
+                     BorderThickness="{TemplateBinding BorderThickness}"
+                     BorderBrush="{TemplateBinding BorderBrush}">
+                            <Border.RenderTransform>
+                                <RotateTransform x:Name="Rotation"/>
+                            </Border.RenderTransform>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="DefaultStates">
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_Indicator" Storyboard.TargetProperty="Opacity">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_RefreshTimeLabel" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BusyIndicator" Storyboard.TargetProperty="IsRunning">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <s:Boolean>
+                                                            False
+                                                        </s:Boolean>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation
+                                         Storyboard.TargetName="IndicatorRotate"
+                                         Storyboard.TargetProperty="Angle"
+                                         To="0"
+                                         Duration="0:0:0.5">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="RefreshStarting">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_Indicator" Storyboard.TargetProperty="Opacity">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_RefreshTimeLabel" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BusyIndicator" Storyboard.TargetProperty="IsRunning">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <s:Boolean>
+                                                            False
+                                                        </s:Boolean>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation
+                                         Storyboard.TargetName="IndicatorRotate"
+                                         Storyboard.TargetProperty="Angle"
+                                         To="-180"
+                                         Duration="0:0:0.5">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Refreshing">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                         Storyboard.TargetName="IndicatorRotate"
+                                         Storyboard.TargetProperty="Angle"
+                                         To="0"
+                                         Duration="0:0:0.5">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_Indicator" Storyboard.TargetProperty="Opacity">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_RefreshTimeLabel" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BusyIndicator" Storyboard.TargetProperty="IsRunning">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <s:Boolean>
+                                                            True
+                                                        </s:Boolean>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="OrientationStates">
+                                    <VisualState x:Name="Vertical">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Rotation" Storyboard.TargetProperty="Angle">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Horizontal">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Rotation" Storyboard.TargetProperty="Angle">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="-90"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid x:Name="NormalLayout" Margin="{StaticResource PhoneHorizontalMargin}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter
+                                 x:Name="PART_Indicator"
+                                 Margin="{StaticResource PhoneMargin}"
+                                 RenderTransformOrigin="0.5, 0.5">
+                                    <ContentPresenter.ContentTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Path Data="F1M69,689.3457L81.369,699.0007L86.128,695.3747L63,677.9087L63,712.9997L69,708.7457z" Fill="Gray" Height="35.091" Opacity="0.33000200986862183" Stretch="Fill" Width="23.128" HorizontalAlignment="Left" Margin="16,3.334,0,0" UseLayoutRounding="False" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                                                    <Path.RenderTransform>
+                                                        <CompositeTransform Rotation="90" TranslateX="-5.706" TranslateY="10.294"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                                <Path Data="F1M85.5693,707.2471L72.0003,717.5881L72.0003,697.0001z" Fill="Black" Height="20.588" Stretch="Fill" Width="13.569" HorizontalAlignment="Left" Margin="25,22.425,0,0" UseLayoutRounding="False" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                                                    <Path.RenderTransform>
+                                                        <CompositeTransform Rotation="90" TranslateX="-21.765" TranslateY="2.675"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                                <Path Data="F1M47,699C47,700.1,47.9,701,49,701L60,701L60,691L49,691C47.9,691,47,691.9,47,693z" Fill="Gray" Height="10" Opacity="0.33000200986862183" Stretch="Fill" Width="13" HorizontalAlignment="Left" Margin="0,16.425,0,0" UseLayoutRounding="False" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                                                    <Path.RenderTransform>
+                                                        <CompositeTransform Rotation="90" TranslateX="14.812" TranslateY="-11.316"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ContentPresenter.ContentTemplate>
+                                    <ContentPresenter.RenderTransform>
+                                        <RotateTransform x:Name="IndicatorRotate" Angle="0"/>
+                                    </ContentPresenter.RenderTransform>
+                                </ContentPresenter>
+
+                                <telerikPrimitives:RadBusyIndicator
+                             AnimationStyle="AnimationStyle7"
+                             ContentPosition="Right"
+                             Foreground="Black"
+                             HorizontalAlignment="Left"
+                             VerticalAlignment="Stretch"
+                             VerticalContentAlignment="Top"
+                             Content="{x:Null}"
+                             x:Name="BusyIndicator"/>
+                                <StackPanel
+                             VerticalAlignment="Center"
+                             Grid.Column="1"
+                             Orientation="Vertical"
+                             Margin="30, 0, 0, 0">
+                                    <TextBlock
+                                     x:Name="PART_RefreshInfoLabel"
+                                     FontFamily="{StaticResource PhoneFontFamilySemiLight}"
+                                     FontSize="{StaticResource PhoneFontSizeMediumLarge}"/>
+                                    <TextBlock
+                                     x:Name="PART_RefreshTimeLabel"
+                                     FontFamily="{StaticResource PhoneFontFamilySemiBold}"
+                                     FontSize="{StaticResource PhoneFontSizeSmall}"
+                                     Foreground="Gray"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </phone:PhoneApplicationPage.Resources>
+
+    <Grid x:Name="LayoutRoot" Background="White">
+        <controls:Pivot Foreground="#FF08568D" HeaderTemplate="{StaticResource HeaderTemplate}">
+            <controls:Pivot.TitleTemplate>
+                <DataTemplate>
+                    <Image Source="/develop-logo.png" Stretch="UniformToFill" Height="85" Margin="0,0,42,0"/>
+                </DataTemplate>
+            </controls:Pivot.TitleTemplate>
+            <controls:PivotItem Margin="12,0" Name="newsPivotItem" Header="news" Loaded="newsPivotItem_Loaded">
+                <Grid x:Name="NewsContentPanel" Grid.Row="1">
+                    <telerikPrimitives:RadDataBoundListBox x:Name="newsFeedListBox" SelectionChanged="FeedListBox_SelectionChanged"
+                             ItemTemplate="{StaticResource FeedItemTemplate}" 
+                             IsPullToRefreshEnabled="True" PullToRefreshIndicatorStyle="{StaticResource RefreshControl}"  RefreshRequested="newsFeedListBox_RefreshRequested" 
+                             EmptyContent="Loading News..." Margin="0"/>
+                </Grid>
+            </controls:PivotItem>
+            <controls:PivotItem Name="featuresPivotItem" Margin="12,0" Header="features" Loaded="featuresPivotItem_Loaded">
+                <Grid x:Name="FeaturesContentPanel" Grid.Row="1" Margin="0,0,12,0">
+                    <telerikPrimitives:RadDataBoundListBox x:Name="featuresFeedListBox" SelectionChanged="FeedListBox_SelectionChanged"
+                             ItemTemplate="{StaticResource FeedItemTemplate}" 
+                             IsPullToRefreshEnabled="True" PullToRefreshIndicatorStyle="{StaticResource RefreshControl}" RefreshRequested="featuresFeedListBox_RefreshRequested" 
+                             EmptyContent="Loading Features..." Margin="0"/>
+                </Grid>
+            </controls:PivotItem>
+            <controls:PivotItem Margin="12,0" Name="blogPivotItem" Header="blog" Loaded="blogPivotItem_Loaded">
+                <Grid x:Name="BlogContentPanel" Grid.Row="1" Margin="0,0,12,0">
+                    <telerikPrimitives:RadDataBoundListBox x:Name="blogFeedListBox" SelectionChanged="FeedListBox_SelectionChanged"
+                             ItemTemplate="{StaticResource FeedItemTemplate}" 
+                             IsPullToRefreshEnabled="True" PullToRefreshIndicatorStyle="{StaticResource RefreshControl}" RefreshRequested="blogFeedListBox_RefreshRequested" 
+                             EmptyContent="Loading Blog..." Margin="0"/>
+                </Grid>
+            </controls:PivotItem>
+        </controls:Pivot>
+    </Grid>
+
+</phone:PhoneApplicationPage>
